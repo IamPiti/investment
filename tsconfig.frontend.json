@@ -1,0 +1,27 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "outDir": "./dist/frontend",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "jsx": "react"
+  },
+  "files": [
+    "src/frontend/index.ts"
+  ],
+  "include": [
+    "src/frontend/**/*",
+    "src/common/**/*",
+  ],
+  "exclude": ["node_modules"]
+}
