@@ -95,4 +95,26 @@ export class Actions {
             alert('Failed to clear game data');
         }
     }
+
+    async readApple(): Promise<any> {
+        try {
+            const response = await fetch(`${this.API_URL}/read-apple`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await response.json();
+            
+            if (data.error) {
+                alert(data.error);
+                return null;
+            }
+            
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+            return null;
+        }
+    }
 }

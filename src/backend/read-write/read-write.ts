@@ -33,6 +33,18 @@ async function initializeDatabase() {
             `);
 
             db.run(`
+                CREATE TABLE IF NOT EXISTS Apple (
+                    time DateTime PRIMARY KEY,
+                    close REAL,
+                    volume INTEGER,
+                    open REAL,
+                    high REAL,
+                    low REAL,
+                    adjClose REAL
+                )
+            `);
+
+            db.run(`
                 CREATE TABLE IF NOT EXISTS portfolio (
                     symbol TEXT PRIMARY KEY,
                     quantity INTEGER NOT NULL
@@ -238,6 +250,23 @@ export function loadState(): Promise<State> {
                         );
                     });
                 });
+            });
+        });
+    });
+}
+
+export function loadAppleData(): Promise<any> {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+        
+            // Load balance
+            db.all<any>('SELECT * FROM apple', (err, row) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                //console.log(row);
+                resolve(row);
             });
         });
     });

@@ -12,6 +12,17 @@ export interface Portfolio {
     [key: string]: number;
 }
 
+export interface priceHistory {
+    time: string;       // or Date if you prefer Date objects
+    close: number;
+    volume: number;
+    open: number;
+    high: number;
+    low: number;
+    adjClose: number;
+}
+
+
 export interface State {
     balance: number;
     portfolio: Portfolio;

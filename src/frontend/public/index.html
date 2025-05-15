@@ -5,6 +5,9 @@
   <title>Investment Simulator</title>
   <link rel="stylesheet" href="/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1"></script>
 </head>
 <body>
   <div id="app">
@@ -20,6 +23,11 @@
     <h2>Wealth Over Time</h2>
     <canvas id="wealthChart" width="600" height="150"></canvas>
     <div id="content"></div>
+
+    <h2>Apple price</h2>
+    <canvas id="appleData" width="600" height="300"></canvas>
+
+
   </div>
   <script src="/index.js"></script>
 </body>
