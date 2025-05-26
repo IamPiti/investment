@@ -4,6 +4,7 @@ import { sellStock } from './sellStock';
 import { updatePrices } from './updatePrices';
 import { clearData } from './clearData';
 import { readApple } from './readApple';
+import { saveApple } from './saveApple';
 
 const router = Router();
 
@@ -13,6 +14,7 @@ router.post('/sell', sellStock);
 router.post('/update-prices', updatePrices);
 router.post('/clear-data', clearData);
 router.get('/read-apple', readApple);
+router.get('/api-request', saveApple);
 
 
 export default router;

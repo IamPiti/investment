@@ -3,8 +3,19 @@ import { CandlestickController, CandlestickElement } from 'chartjs-chart-financi
 import 'chartjs-adapter-date-fns';
 import { parse } from 'date-fns';
 
+declare global {
+    interface Window {  
+        saveApple: () => void;
+    }
+}
+
 // Register chart.js components
 Chart.register(...registerables, TimeScale, CandlestickController, CandlestickElement);
+
+export interface APIaction {
+    onsaveApple: () => void;
+    onreadApple: () => void;
+}
 
 // Define the shape of the data
 export interface AppleDataPoint {
@@ -29,8 +40,33 @@ export interface ChartData {
 
 export class RendererFinance {
   private chart: Chart;
+  
+  private actions: APIaction | null = null;
 
-  constructor() {
+  public setActions(actions: APIaction) {
+    this.actions = actions;
+  }
+
+  constructor(actions: APIaction | null = null) {
+    this.actions = actions;
+
+    // Create load API button
+    const loadApiButton = document.createElement('button');
+    loadApiButton.textContent = 'Load API';
+    loadApiButton.className = 'load-api-button';
+    loadApiButton.style.cssText = 'position: fixed; top: 50px; right: 10px; padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;';
+    document.body.appendChild(loadApiButton);
+
+    // Button handlers
+    loadApiButton.onclick = () => {
+      if (confirm('Load data with API?') && this.actions) {
+      this.actions.onsaveApple();
+      this.actions.onreadApple();
+      } else if (!this.actions) {
+        console.error('No API action registered!');
+      }
+    };
+
     const canvas = document.getElementById('appleData') as HTMLCanvasElement;
     if (!canvas) throw new Error('Missing required DOM elements');
 
@@ -82,7 +118,7 @@ export class RendererFinance {
 
     // Prepare the candlestick data from raw data
     const candlestickData = data.time.map((timeStr, i) => ({
-      x: parse(timeStr, 'MM/dd/yyyy', new Date()).getTime(), // parse the date string into a Date object and get timestamp
+      x: parse(timeStr, 'yyyy-MM-dd', new Date()).getTime(), // parse the date string into a Date object and get timestamp
       o: data.open[i],
       h: data.high[i],
       l: data.low[i],

@@ -117,4 +117,26 @@ export class Actions {
             return null;
         }
     }
+
+    async saveApple(): Promise<any> {
+        try {
+            const response = await fetch(`${this.API_URL}/api-request`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await response.json();
+            
+            if (data.error) {
+                alert(data.error);
+                return null;
+            }
+            
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+            return null;
+        }
+    }
 }

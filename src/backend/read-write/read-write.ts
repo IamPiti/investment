@@ -2,6 +2,7 @@ import sqlite3 from 'sqlite3';
 import path from 'path';
 import { State } from '../../common/types';
 import { DEFAULT_BALANCE, DEFAULT_STOCKS } from '../../common/defaults';
+import { readAppleData } from '../routes/AAPLapi';
 
 const dbDir = path.join(process.cwd(), 'db');
 const dbPath = path.join(dbDir, 'investment.db');
@@ -255,6 +256,36 @@ export function loadState(): Promise<State> {
     });
 }
 
+
+
+// Save Apple data to database
+export async function saveAppleData(timeSeries: Record<string, any>) {
+    return new Promise<void>((resolve, reject) => {
+        db.serialize(() => {
+            const stmt = db.prepare(
+                `INSERT OR REPLACE INTO apple 
+                (time, close, volume, open, high, low, adjClose) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)`
+            );
+            for (const [date, daily] of Object.entries(timeSeries)) {
+                stmt.run(
+                    date,
+                    Number(daily["4. close"]),
+                    Number(daily["5. volume"]),
+                    Number(daily["1. open"]),
+                    Number(daily["2. high"]),
+                    Number(daily["3. low"]),
+                    Number(daily["5. adjclose"] || daily["4. close"]) // use adjusted if available
+                );
+            }
+            stmt.finalize((err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+    });
+}
+
 export function loadAppleData(): Promise<any> {
     return new Promise((resolve, reject) => {
         db.serialize(() => {
@@ -271,3 +302,21 @@ export function loadAppleData(): Promise<any> {
         });
     });
 }
+
+
+/*
+export async function fetchAndSaveApple() {
+    try {
+        const data = await readAppleData();
+        const timeSeries = data["Time Series (Daily)"];
+        if (timeSeries) {
+            await saveAppleData(timeSeries);
+            console.log('Apple data saved to DB!');
+        } else {
+            console.error('Alpha Vantage data does not contain Time Series (Daily)');
+        }
+    } catch (error) {
+        console.error('Error fetching/saving Apple data:', error);
+    }
+}
+*/

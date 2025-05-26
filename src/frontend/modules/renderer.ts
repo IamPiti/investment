@@ -75,9 +75,9 @@ export class Renderer {
         this.datetimeElement = datetimeElement;
 
         this.updateDateTime();
-        setInterval(() => this.updateDateTime(), 1000); // Update clock every second
+        setInterval(() => this.updateDateTime(), 10000);
 
-        // Add clear data button click handler
+        // Button handlers
         clearDataButton.onclick = () => {
             if (this.actions && confirm('Are you sure you want to reset the game? This will clear all your progress.')) {
                 this.actions.onClearData();
@@ -86,51 +86,41 @@ export class Renderer {
     }
 
     public updateBalance(balance: number): void {
-        if (this.balanceElement) {
-            this.balanceElement.innerText = `Balance: $${balance.toFixed(2)}`;
-        }
+        this.balanceElement.innerText = `Balance: $${balance.toFixed(2)}`;
     }
 
     public updateStockValue(stockValue: number): void {
-        if (this.stockValueElement) {
-            this.stockValueElement.innerText = `Stock Value: $${stockValue.toFixed(2)}`;
-        }
+        this.stockValueElement.innerText = `Stock Value: $${stockValue.toFixed(2)}`;
     }
 
     public updateStockList(stocks: Stock[], actions: GameActions): void {
         this.actions = actions;
-        if (this.stockListElement) {
-            // Make functions available globally for onclick handlers
-            window.buyStock = actions.onBuy;
-            window.sellStock = actions.onSell;
-            this.stockListElement.innerHTML = '';
-            stocks.forEach(stock => {
-                const div = document.createElement('div');
-                div.innerHTML = `
-                    ${stock.symbol} - $${stock.price.toFixed(2)}
-                    <button onclick="window.buyStock('${stock.symbol}', ${stock.price})">Buy</button>
-                    <button onclick="window.sellStock('${stock.symbol}', ${stock.price})">Sell</button>
-                `;
-                this.stockListElement?.appendChild(div);
-            });
-        }
+        window.buyStock = actions.onBuy;
+        window.sellStock = actions.onSell;
+        this.stockListElement.innerHTML = '';
+        stocks.forEach(stock => {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                ${stock.symbol} - $${stock.price.toFixed(2)}
+                <button onclick="window.buyStock('${stock.symbol}', ${stock.price})">Buy</button>
+                <button onclick="window.sellStock('${stock.symbol}', ${stock.price})">Sell</button>
+            `;
+            this.stockListElement.appendChild(div);
+        });
     }
 
     public updatePortfolio(portfolio: Portfolio, stocks: Stock[]): void {
-        if (this.portfolioElement) {
-            this.portfolioElement.innerHTML = Object.entries(portfolio).map(([symbol, qty]) => {
+        this.portfolioElement.innerHTML = Object.entries(portfolio)
+            .map(([symbol, qty]) => {
                 const stock = stocks.find(s => s.symbol === symbol);
                 const total = stock ? qty * stock.price : 0;
                 return `<div>${symbol}: ${qty} shares ($${total.toFixed(2)})</div>`;
-            }).join('');
-        }
+            })
+            .join('');
     }
 
     private updateDateTime(): void {
-        if (this.datetimeElement) {
-            const now = new Date();
-            this.datetimeElement.innerText = now.toLocaleString();
-        }
+        this.datetimeElement.innerText = new Date().toLocaleString();
     }
 
     private initializeChart(ctx: CanvasRenderingContext2D): Chart {
@@ -139,52 +129,21 @@ export class Renderer {
             data: {
                 labels: [],
                 datasets: [
-                    {
-                        label: 'Cash',
-                        data: [],
-                        borderColor: 'green',
-                        fill: false
-                    },
-                    {
-                        label: 'Stock Value',
-                        data: [],
-                        borderColor: 'blue',
-                        fill: false
-                    },
-                    {
-                        label: 'Total Wealth',
-                        data: [],
-                        borderColor: 'black',
-                        borderWidth: 2,
-                        fill: false
-                    }
+                    { label: 'Cash', data: [], borderColor: 'green', fill: false },
+                    { label: 'Stock Value', data: [], borderColor: 'blue', fill: false },
+                    { label: 'Total Wealth', data: [], borderColor: 'black', borderWidth: 2, fill: false }
                 ]
             },
-            options: {
-                responsive: true,
-                animation: false,
-                scales: {
-                    y: {
-                        beginAtZero: false
-                    }
-                }
-            }
+            options: { responsive: true, animation: false, scales: { y: { beginAtZero: false } } }
         };
         return new Chart(ctx, config);
     }
 
-    public updateChartDisplay(
-        wealthHistory: WealthData[],
-        timeLabels: string[]
-    ): void {
-        const cashData = wealthHistory.map(w => w.cash);
-        const stockData = wealthHistory.map(w => w.stockValue);
-        const totalData = wealthHistory.map(w => w.cash + w.stockValue);
-    
+    public updateChartDisplay(wealthHistory: WealthData[], timeLabels: string[]): void {
         this.chart.data.labels = timeLabels;
-        this.chart.data.datasets[0].data = cashData;
-        this.chart.data.datasets[1].data = stockData;
-        this.chart.data.datasets[2].data = totalData;   
+        this.chart.data.datasets[0].data = wealthHistory.map(w => w.cash);
+        this.chart.data.datasets[1].data = wealthHistory.map(w => w.stockValue);
+        this.chart.data.datasets[2].data = wealthHistory.map(w => w.cash + w.stockValue);
         this.chart.update();
     }
 }
