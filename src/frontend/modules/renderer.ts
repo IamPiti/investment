@@ -75,7 +75,7 @@ export class Renderer {
         this.datetimeElement = datetimeElement;
 
         this.updateDateTime();
-        setInterval(() => this.updateDateTime(), 10000);
+        setInterval(() => this.updateDateTime(), 1000);
 
         // Button handlers
         clearDataButton.onclick = () => {

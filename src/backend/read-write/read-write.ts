@@ -304,6 +304,27 @@ export function loadAppleData(): Promise<any> {
 }
 
 
+export function load30dayData(): Promise<any> {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            // Load last 30 days of Apple data
+            const sql = `
+                SELECT * FROM apple 
+                ORDER BY time DESC 
+                LIMIT 30
+            `;
+            db.all<any>(sql, (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(rows);
+            });
+        });
+    });
+}
+
+
 /*
 export async function fetchAndSaveApple() {
     try {

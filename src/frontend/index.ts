@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       // Render your candlesticks
-      rendererFinance.render(chartData);
+      // rendererFinance.render(chartData);
     },
 
     onreadApple: async () => {

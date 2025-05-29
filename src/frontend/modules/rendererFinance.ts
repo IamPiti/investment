@@ -50,6 +50,12 @@ export class RendererFinance {
   constructor(actions: APIaction | null = null) {
     this.actions = actions;
 
+    /*
+    if (this.actions?.onreadApple) {
+      this.actions.onreadApple();
+    }
+    */
+
     // Create load API button
     const loadApiButton = document.createElement('button');
     loadApiButton.textContent = 'Load API';
@@ -57,11 +63,27 @@ export class RendererFinance {
     loadApiButton.style.cssText = 'position: fixed; top: 50px; right: 10px; padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;';
     document.body.appendChild(loadApiButton);
 
+    // Create load Display button
+    const displayAppleButton = document.createElement('button');
+    displayAppleButton.textContent = 'Display data';
+    displayAppleButton.className = 'display-data-button';
+    displayAppleButton.style.cssText = 'position: fixed; top: 90px; right: 10px; padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;';
+    document.body.appendChild(displayAppleButton);
+
     // Button handlers
     loadApiButton.onclick = () => {
-      if (confirm('Load data with API?') && this.actions) {
+      if (confirm('Load API data?') && this.actions) {
       this.actions.onsaveApple();
+      } else if (!this.actions) {
+        console.error('No API action registered!');
+      }
+    };
+
+    // Button handlers
+    displayAppleButton.onclick = () => {
+      if (confirm('Display data?') && this.actions) {
       this.actions.onreadApple();
+      displayAppleButton.disabled = true; // Disable the button after displaying data
       } else if (!this.actions) {
         console.error('No API action registered!');
       }
@@ -83,14 +105,35 @@ export class RendererFinance {
         datasets: [
           {
             label: 'AAPL Stock',
-            data: [], // will be filled later with {x, o, h, l, c}
+            data: [], // will be filled later
             borderColor: 'black'
-          }
+          } 
         ]
       },
       options: {
         responsive: true,
         animation: false,
+
+        // ← add your interaction settings here
+        interaction: {
+          mode: 'nearest',
+          intersect: false
+        },
+
+        // ← enable and customize tooltips here
+        plugins: {
+          tooltip: {
+            enabled: true,
+            callbacks: {
+              label: ctx => {
+                const { o, h, l, c } = ctx.raw as { o: number; h: number; l: number; c: number };
+                return [`O: ${o}`, `H: ${h}`, `L: ${l}`, `C: ${c}`];
+              }
+            }
+          }
+        },
+
+        // ← your existing scales block
         scales: {
           x: {
             type: 'time',
@@ -102,11 +145,13 @@ export class RendererFinance {
         }
       }
     };
+
     return new Chart(ctx, config);
   }
 
   // Render the candlestick chart with the data
   public render(data: ChartData): void {
+
     if (!this.chart) {
       throw new Error('Chart is not initialized');
     }
@@ -130,3 +175,5 @@ export class RendererFinance {
     this.chart.update();
   }
 }
+
+
