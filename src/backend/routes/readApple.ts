@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { StockActionRequest, StateResponse, ErrorResponse } from '../../common/types';
-import { load30dayData, loadAppleData} from '../read-write/read-write';
+import { loadAppleData} from '../read-write/read-write';
 
 
 export async function readApple(req: Request<{}, StateResponse | ErrorResponse, StockActionRequest>, res: Response<StateResponse | ErrorResponse>) {
